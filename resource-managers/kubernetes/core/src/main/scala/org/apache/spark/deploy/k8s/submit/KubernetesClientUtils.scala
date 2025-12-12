@@ -122,8 +122,9 @@ object KubernetesClientUtils extends Logging {
    */
   @Since("4.1.0")
   def buildConfigMapJava(configMapName: String, confFileMap: JMap[String, String],
-      withLabels: JMap[String, String]): ConfigMap = {
-    buildConfigMap(configMapName, confFileMap.asScala.toMap, withLabels.asScala.toMap)
+      conf: SparkConf, withLabels: JMap[String, String]): ConfigMap = {
+    buildConfigMap(configMapName, confFileMap.asScala.toMap,
+      conf, withLabels.asScala.toMap)
   }
 
   /**
@@ -132,9 +133,9 @@ object KubernetesClientUtils extends Logging {
    */
   @Since("3.1.0")
   def buildConfigMap(configMapName: String, confFileMap: Map[String, String],
-      withLabels: Map[String, String] = Map()): ConfigMap = {
-    val configMapNameSpace =
-      confFileMap.getOrElse(KUBERNETES_NAMESPACE.key, KUBERNETES_NAMESPACE.defaultValueString)
+      conf: SparkConf, withLabels: Map[String, String] = Map()): ConfigMap = {
+    val configMapNameSpace: String = conf.get(
+      KUBERNETES_NAMESPACE.key, KUBERNETES_NAMESPACE.defaultValueString)
     new ConfigMapBuilder()
       .withNewMetadata()
         .withName(configMapName)
